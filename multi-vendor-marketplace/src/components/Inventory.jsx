@@ -33,8 +33,10 @@ const Inventory = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        console.log("Fetching Inventory products..."); // Debugging output
         setLoading(true);
         const token = localStorage.getItem("token"); // Get token from localStorage
+        console.log("Token In Inventory:", token); // Debugging output
         const response = await fetch(
           "http://localhost:5000/api/products/inventory",
           {
@@ -46,6 +48,7 @@ const Inventory = () => {
         );
         if (!response.ok) throw new Error("Failed to fetch products");
         const data = await response.json();
+        console.log("Fetched Products in Inventory:", data); // Debugging output
         setProducts(data);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -95,19 +98,9 @@ const Inventory = () => {
       return productOwnerId === userId && matchesSearch && matchesCategory;
     }
 
-    // if (userRole === "vendor") {
-    //   return product.owner === userId && matchesSearch && matchesCategory;
-    // }
-
     // If user is a client, show nothing
     return false;
   });
-
-  // const filteredProducts = products.filter(
-  //   (product) =>
-  //     product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-  //     (category === "All" || product.category === category)
-  // );
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
@@ -276,12 +269,12 @@ const Inventory = () => {
                 />
                 <h3 className="text-lg font-semibold">{product.name}</h3>
                 <p className="text-gray-600">${product.price}</p>
-                <button
+                {/* <button
                   onClick={() => handleAddToCart(product)}
                   className="mt-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition"
                 >
                   Add to Cart
-                </button>
+                </button> */}
                 {/* Edit Product Button */}
                 <button
                   onClick={() => {

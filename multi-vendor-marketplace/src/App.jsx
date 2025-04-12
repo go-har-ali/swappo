@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
+import { useState, useEffect } from "react";
 //import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import Cart from "./components/Cart";
@@ -10,8 +11,17 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Inventory from "./components/Inventory";
 //import CreateProducts from "./components/CreateProduct";
+import MakeAnOffer from "./components/Offer";
+import socket from "./socket";
 
 function App() {
+  useEffect(() => {
+    const userId = localStorage.getItem("userId"); // or from context
+    if (userId) {
+      socket.emit("join", userId);
+    }
+  }, []);
+
   return (
     <CartProvider>
       <Router>
@@ -25,6 +35,7 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/inventory" element={<Inventory />} />
+          <Route path="/offer" element={<MakeAnOffer />} />
           <Route path="/checkout" element={<CheckoutPage />} />
         </Routes>
       </Router>

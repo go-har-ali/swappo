@@ -73,14 +73,14 @@ router.post(
 );
 
 // ✅ Clients and Vendors can view products
-router.get("/", verifyToken, async (req, res) => {
-  try {
-    const products = await Product.find().populate("owner", "name email");
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
+// router.get("/", verifyToken, async (req, res) => {
+//   try {
+//     const products = await Product.find().populate("owner", "name email");
+//     res.json(products);
+//   } catch (error) {
+//     res.status(500).json({ error: "Internal server error" });
+//   }
+// });
 
 // Get products owned by the logged-in user
 router.get(
@@ -89,11 +89,15 @@ router.get(
   verifyRole("vendor"),
   async (req, res) => {
     try {
+      console.log("💡 /inventory route hit");
+      console.log("➡️ req.user:", req.user); // shows what's inside the decoded token
+
       //const userId = req.query.userId; // Get userId from frontend
 
       const vendorId = req.user.userId; // Get vendor's ID from the token
 
       if (!vendorId) {
+        console.log("❌ vendorId missing from token!");
         return res.status(400).json({ error: "User ID is required" });
       }
 
@@ -102,9 +106,11 @@ router.get(
         "name email"
       );
 
+      console.log("✅ Fetched products:", products);
+
       res.json(products);
     } catch (error) {
-      console.error("Error fetching user products:", error);
+      console.error("❌ Error in /inventory route:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   }

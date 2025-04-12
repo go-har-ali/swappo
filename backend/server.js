@@ -2,17 +2,26 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("./models/User");
-const Product = require("./models/Product");
+const User = require("./models/User.js");
+const Product = require("./models/Product.js");
 const multer = require("multer");
 const path = require("path");
+const http = require("http");
+const socketIO = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
 
-const productRoutes = require("./routes/products");
+const productRoutes = require("./routes/products.js");
 const cartRoutes = require("./routes/cart.js");
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server, {
+  cors: {
+    origin: "http://localhost:5173", // frontend URL
+    methods: ["GET", "POST"],
+  },
+});
 
 app.use(cors());
 app.use(express.json()); // For parsing JSON body
@@ -32,6 +41,34 @@ mongoose
 
 mongoose.set("bufferTimeoutMS", 30000);
 
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  // Listen for trade requests
+  socket.on("tradeRequest", (data) => {
+    const { toUserId, fromUserId, productId, offerValue } = data;
+
+    // Emit to the recipient user
+    io.to(toUserId).emit("receiveTradeRequest", {
+      fromUserId,
+      productId,
+      offerValue,
+    });
+  });
+
+  socket.on("respondToTrade", (data) => {
+    io.to(data.fromUserId).emit("tradeResponse", data);
+  });
+
+  socket.on("join", (userId) => {
+    socket.join(userId); // Use userId as room
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/"); // Directory to store uploaded files
@@ -46,7 +83,8 @@ const upload = multer({ storage: storage });
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/products", productRoutes);
-app.use("api/products/inventory", productRoutes);
+//app.use("api/products/inventory", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.post("/api/register", upload.single("profilePicture"), async (req, res) => {
   console.log("req body", req.body); // Debugging
@@ -134,4 +172,4 @@ async function isValidPassword(user, password) {
   return await bcrypt.compare(password, user.password); // assuming user.password is the hashed password
 }
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+server.listen(5000, () => console.log("Server running on port 5000"));

@@ -1,10 +1,38 @@
+import { useState, useEffect } from "react";
 import { useCart } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import { FaTrashAlt } from "react-icons/fa";
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
+import socket from "../socket";
 
 const Cart = () => {
   const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
+  const navigate = useNavigate();
+
+  const handleTrade = (item) => {
+    const fromUserId = localStorage.getItem("userId");
+    const toUserId = item.ownerId; // Get this from product data
+
+    const offerValue = item.price; // or user-entered value
+
+    socket.emit("tradeRequest", {
+      fromUserId,
+      toUserId,
+      productId: item._id,
+      offerValue,
+    });
+
+    alert("Trade request sent!");
+  };
+
+  useEffect(() => {
+    socket.on("tradeResponse", (data) => {
+      alert(`Your trade was ${data.status}`);
+    });
+
+    return () => socket.off("tradeResponse");
+  }, []);
 
   return (
     <>
@@ -25,10 +53,20 @@ const Cart = () => {
                 <div key={item._id} className="flex mb-6 border-b pb-6">
                   <div className="w-1/3 flex justify-center">
                     <img
-                      src={item.img}
+                      src={
+                        item.images && item.images.length > 0
+                          ? `http://localhost:5000/uploads/${item.images[0]}`
+                          : "https://via.placeholder.com/150"
+                      }
                       alt={item.name}
                       className="w-40 h-40 object-cover rounded-lg shadow"
                     />
+
+                    {/* <img
+                      src={`http://localhost:5000/${item.img}`}
+                      alt={item.name}
+                      className="w-40 h-40 object-cover rounded-lg shadow"
+                    /> */}
                   </div>
 
                   <div className="w-2/3 p-4">
@@ -66,7 +104,12 @@ const Cart = () => {
                       <button className="bg-black text-white px-6 py-3 rounded-lg text-lg">
                         TRADE
                       </button>
-                      <button className="bg-black text-white px-6 py-3 rounded-lg text-lg">
+                      <button
+                        onClick={() =>
+                          navigate("/offer", { state: { product: item } })
+                        }
+                        className="bg-black text-white px-6 py-3 rounded-lg text-lg"
+                      >
                         MAKE AN OFFER
                       </button>
                     </div>

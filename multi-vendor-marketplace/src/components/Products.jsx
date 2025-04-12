@@ -1,216 +1,3 @@
-// import { useEffect, useState } from "react";
-// import { motion } from "framer-motion";
-// import { useNavigate } from "react-router-dom";
-// import Footer from "./Footer";
-// import Navbar from "./Navbar";
-// import { useCart } from "../context/CartContext";
-
-// const Products = () => {
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [products, setProducts] = useState([]);
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const productsPerPage = 7;
-
-//   const { addToCart } = useCart();
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const fetchProducts = async () => {
-//       try {
-//         setLoading(true);
-//         const response = await fetch("http://localhost:5000/api/products");
-//         if (!response.ok) throw new Error("Failed to fetch products");
-//         const data = await response.json();
-//         setProducts(data);
-//       } catch (error) {
-//         console.error("Error fetching products:", error);
-//         setError(error.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchProducts();
-//   }, []);
-
-//   const totalPages = Math.ceil(products.length / productsPerPage);
-//   const startIndex = (currentPage - 1) * productsPerPage;
-//   const displayedProducts = products.slice(startIndex, startIndex + productsPerPage);
-
-//   return (
-//     <>
-//       <Navbar />
-//       <div className="bg-white text-black min-h-screen p-6 flex flex-col items-center">
-//         <div className="text-center w-full mb-6">
-//           <h1 className="text-3xl font-bold">Explore Our Products</h1>
-//         </div>
-
-//         {/* Inventory Button */}
-//         <button
-//           onClick={() => navigate("/inventory")}
-//           className="mb-4 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
-//         >
-//           Manage Inventory
-//         </button>
-
-//         {/* Product Grid */}
-//         {loading ? (
-//           <p>Loading products...</p>
-//         ) : error ? (
-//           <p className="text-red-500">Error: {error}</p>
-//         ) : (
-//           <motion.div
-//             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-//             initial={{ opacity: 0 }}
-//             animate={{ opacity: 1 }}
-//             transition={{ duration: 0.6 }}
-//           >
-//             {displayedProducts.length > 0 ? (
-//               displayedProducts.map((product) => (
-//                 <motion.div
-//                   key={product._id}
-//                   className="bg-gray-100 text-black p-4 rounded-lg shadow-md flex flex-col items-center"
-//                   whileHover={{ scale: 1.05 }}
-//                 >
-//                   <img
-//                     src={
-//                       product.images && product.images.length > 0
-//                         ? `http://localhost:5000/uploads/${product.images[0]}`
-//                         : "https://via.placeholder.com/150"
-//                     }
-//                     alt={product.name}
-//                     className="h-32 w-auto object-contain mb-3"
-//                   />
-//                   <h3 className="text-lg font-semibold">{product.name}</h3>
-//                   <p className="text-gray-600">${product.price}</p>
-//                   <button
-//                     onClick={() => addToCart(product)}
-//                     className="mt-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-//                   >
-//                     Add to Cart
-//                   </button>
-//                 </motion.div>
-//               ))
-//             ) : (
-//               <p className="text-center text-gray-500 col-span-full">No products found.</p>
-//             )}
-//           </motion.div>
-//         )}
-
-//         {/* Pagination */}
-//         <div className="mt-6 flex space-x-2">
-//           {[...Array(totalPages)].map((_, index) => (
-//             <button
-//               key={index}
-//               onClick={() => setCurrentPage(index + 1)}
-//               className={`px-4 py-2 rounded-lg ${
-//                 currentPage === index + 1 ? "bg-black text-white" : "bg-gray-200"
-//               }`}
-//             >
-//               {index + 1}
-//             </button>
-//           ))}
-//         </div>
-//       </div>
-//       <Footer />
-//     </>
-//   );
-// };
-
-// export default Products;
-
-// import { useEffect, useState } from "react";
-// import { motion } from "framer-motion";
-// import { useNavigate } from "react-router-dom";
-// import Footer from "./Footer";
-// import Navbar from "./Navbar";
-
-// const Products = () => {
-//   const [products, setProducts] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const fetchProducts = async () => {
-//       try {
-//         setLoading(true);
-//         const response = await fetch("http://localhost:5000/api/products");
-//         if (!response.ok) throw new Error("Failed to fetch products");
-//         const data = await response.json();
-//         setProducts(data);
-//       } catch (error) {
-//         console.error("Error fetching products:", error);
-//         setError(error.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchProducts();
-//   }, []);
-
-//   return (
-//     <>
-//       <Navbar />
-//       <div className="bg-white text-black min-h-screen p-6 flex flex-col items-center">
-//         <div className="text-center w-full mb-6">
-//           <h1 className="text-3xl font-bold text-black">
-//             Explore Our Products
-//           </h1>
-//         </div>
-
-//         {/* Inventory Button */}
-//         <button
-//           onClick={() => navigate("/inventory")}
-//           className="mb-6 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
-//         >
-//           Manage Inventory
-//         </button>
-
-//         {loading && <p>Loading products...</p>}
-//         {error && <p className="text-red-500">{error}</p>}
-
-//         <motion.div
-//           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6"
-//           initial={{ opacity: 0 }}
-//           animate={{ opacity: 1 }}
-//           transition={{ duration: 0.6 }}
-//         >
-//           {products.length > 0 ? (
-//             products.map((product) => (
-//               <motion.div
-//                 key={product._id}
-//                 className="bg-gray-100 text-black p-4 rounded-lg shadow-md flex flex-col items-center"
-//                 whileHover={{ scale: 1.05 }}
-//                 transition={{ type: "spring", stiffness: 300 }}
-//               >
-//                 <img
-//                   src={
-//                     product.images && product.images.length > 0
-//                       ? `http://localhost:5000/uploads/${product.images[0]}`
-//                       : "https://via.placeholder.com/150" // Default placeholder image
-//                   }
-//                   alt={product.name}
-//                   className="h-32 w-auto object-contain mb-3"
-//                 />
-//                 <h3 className="text-lg font-semibold">{product.name}</h3>
-//                 <p className="text-gray-600">${product.price}</p>
-//               </motion.div>
-//             ))
-//           ) : (
-//             <p className="text-center text-gray-500 col-span-full">
-//               No products found.
-//             </p>
-//           )}
-//         </motion.div>
-//       </div>
-//       <Footer />
-//     </>
-//   );
-// };
-
-// export default Products;
-
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -1170,6 +957,219 @@ export default Products;
 //             </button>
 //           </div>
 //         )}
+//       </div>
+//       <Footer />
+//     </>
+//   );
+// };
+
+// export default Products;
+
+// import { useEffect, useState } from "react";
+// import { motion } from "framer-motion";
+// import { useNavigate } from "react-router-dom";
+// import Footer from "./Footer";
+// import Navbar from "./Navbar";
+// import { useCart } from "../context/CartContext";
+
+// const Products = () => {
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const [products, setProducts] = useState([]);
+//   const [currentPage, setCurrentPage] = useState(1);
+//   const productsPerPage = 7;
+
+//   const { addToCart } = useCart();
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const fetchProducts = async () => {
+//       try {
+//         setLoading(true);
+//         const response = await fetch("http://localhost:5000/api/products");
+//         if (!response.ok) throw new Error("Failed to fetch products");
+//         const data = await response.json();
+//         setProducts(data);
+//       } catch (error) {
+//         console.error("Error fetching products:", error);
+//         setError(error.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProducts();
+//   }, []);
+
+//   const totalPages = Math.ceil(products.length / productsPerPage);
+//   const startIndex = (currentPage - 1) * productsPerPage;
+//   const displayedProducts = products.slice(startIndex, startIndex + productsPerPage);
+
+//   return (
+//     <>
+//       <Navbar />
+//       <div className="bg-white text-black min-h-screen p-6 flex flex-col items-center">
+//         <div className="text-center w-full mb-6">
+//           <h1 className="text-3xl font-bold">Explore Our Products</h1>
+//         </div>
+
+//         {/* Inventory Button */}
+//         <button
+//           onClick={() => navigate("/inventory")}
+//           className="mb-4 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800"
+//         >
+//           Manage Inventory
+//         </button>
+
+//         {/* Product Grid */}
+//         {loading ? (
+//           <p>Loading products...</p>
+//         ) : error ? (
+//           <p className="text-red-500">Error: {error}</p>
+//         ) : (
+//           <motion.div
+//             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             transition={{ duration: 0.6 }}
+//           >
+//             {displayedProducts.length > 0 ? (
+//               displayedProducts.map((product) => (
+//                 <motion.div
+//                   key={product._id}
+//                   className="bg-gray-100 text-black p-4 rounded-lg shadow-md flex flex-col items-center"
+//                   whileHover={{ scale: 1.05 }}
+//                 >
+//                   <img
+//                     src={
+//                       product.images && product.images.length > 0
+//                         ? `http://localhost:5000/uploads/${product.images[0]}`
+//                         : "https://via.placeholder.com/150"
+//                     }
+//                     alt={product.name}
+//                     className="h-32 w-auto object-contain mb-3"
+//                   />
+//                   <h3 className="text-lg font-semibold">{product.name}</h3>
+//                   <p className="text-gray-600">${product.price}</p>
+//                   <button
+//                     onClick={() => addToCart(product)}
+//                     className="mt-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+//                   >
+//                     Add to Cart
+//                   </button>
+//                 </motion.div>
+//               ))
+//             ) : (
+//               <p className="text-center text-gray-500 col-span-full">No products found.</p>
+//             )}
+//           </motion.div>
+//         )}
+
+//         {/* Pagination */}
+//         <div className="mt-6 flex space-x-2">
+//           {[...Array(totalPages)].map((_, index) => (
+//             <button
+//               key={index}
+//               onClick={() => setCurrentPage(index + 1)}
+//               className={`px-4 py-2 rounded-lg ${
+//                 currentPage === index + 1 ? "bg-black text-white" : "bg-gray-200"
+//               }`}
+//             >
+//               {index + 1}
+//             </button>
+//           ))}
+//         </div>
+//       </div>
+//       <Footer />
+//     </>
+//   );
+// };
+
+// export default Products;
+
+// import { useEffect, useState } from "react";
+// import { motion } from "framer-motion";
+// import { useNavigate } from "react-router-dom";
+// import Footer from "./Footer";
+// import Navbar from "./Navbar";
+
+// const Products = () => {
+//   const [products, setProducts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     const fetchProducts = async () => {
+//       try {
+//         setLoading(true);
+//         const response = await fetch("http://localhost:5000/api/products");
+//         if (!response.ok) throw new Error("Failed to fetch products");
+//         const data = await response.json();
+//         setProducts(data);
+//       } catch (error) {
+//         console.error("Error fetching products:", error);
+//         setError(error.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchProducts();
+//   }, []);
+
+//   return (
+//     <>
+//       <Navbar />
+//       <div className="bg-white text-black min-h-screen p-6 flex flex-col items-center">
+//         <div className="text-center w-full mb-6">
+//           <h1 className="text-3xl font-bold text-black">
+//             Explore Our Products
+//           </h1>
+//         </div>
+
+//         {/* Inventory Button */}
+//         <button
+//           onClick={() => navigate("/inventory")}
+//           className="mb-6 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
+//         >
+//           Manage Inventory
+//         </button>
+
+//         {loading && <p>Loading products...</p>}
+//         {error && <p className="text-red-500">{error}</p>}
+
+//         <motion.div
+//           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6"
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           transition={{ duration: 0.6 }}
+//         >
+//           {products.length > 0 ? (
+//             products.map((product) => (
+//               <motion.div
+//                 key={product._id}
+//                 className="bg-gray-100 text-black p-4 rounded-lg shadow-md flex flex-col items-center"
+//                 whileHover={{ scale: 1.05 }}
+//                 transition={{ type: "spring", stiffness: 300 }}
+//               >
+//                 <img
+//                   src={
+//                     product.images && product.images.length > 0
+//                       ? `http://localhost:5000/uploads/${product.images[0]}`
+//                       : "https://via.placeholder.com/150" // Default placeholder image
+//                   }
+//                   alt={product.name}
+//                   className="h-32 w-auto object-contain mb-3"
+//                 />
+//                 <h3 className="text-lg font-semibold">{product.name}</h3>
+//                 <p className="text-gray-600">${product.price}</p>
+//               </motion.div>
+//             ))
+//           ) : (
+//             <p className="text-center text-gray-500 col-span-full">
+//               No products found.
+//             </p>
+//           )}
+//         </motion.div>
 //       </div>
 //       <Footer />
 //     </>

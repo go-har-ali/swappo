@@ -11,6 +11,8 @@ const socketIO = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
 
+// "dev": "nodemon server.js"
+
 const productRoutes = require("./routes/products.js");
 const cartRoutes = require("./routes/cart.js");
 

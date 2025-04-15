@@ -19,7 +19,7 @@ const cartRoutes = require("./routes/cart.js");
 const app = express();
 const server = http.createServer(app);
 
-const io = new socketIO(server, {
+const io = socketIO(server, {
   cors: {
     origin: "https://frontend-swappo-app.vercel.app",
     methods: ["GET", "POST"],

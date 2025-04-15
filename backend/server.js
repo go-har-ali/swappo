@@ -36,6 +36,8 @@ const io = socketIO(server, {
 const allowedOrigins = [
   "http://localhost:5173",
   "https://frontend-swappo-late-app.vercel.app", // ✅ Add your Vercel frontend domain here
+  "https://frontend-swappo-late-app.vercel.app", // ✅ Add this one!
+  "https://frontend-swappo-lala-app.vercel.app", // ✅ Add this one!
 ];
 
 app.use(

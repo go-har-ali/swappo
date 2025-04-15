@@ -18,12 +18,38 @@ const cartRoutes = require("./routes/cart.js");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server, {
+
+const io = new socketIO(server, {
   cors: {
-    origin: "http://localhost:5173", // frontend URL
+    origin: "https://frontend-swappo-app.vercel.app",
     methods: ["GET", "POST"],
   },
 });
+
+// const io = socketIO(server, {
+//   cors: {
+//     origin: "http://localhost:5173", // frontend URL
+//     methods: ["GET", "POST"],
+//   },
+// });
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://frontend-swappo-late-app.vercel.app", // ✅ Add your Vercel frontend domain here
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 app.use(cors());
 app.use(express.json()); // For parsing JSON body

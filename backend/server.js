@@ -7,7 +7,7 @@ const Product = require("./models/Product.js");
 const multer = require("multer");
 const path = require("path");
 const http = require("http");
-const socketIO = require("socket.io");
+//const socketIO = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
 
@@ -17,14 +17,16 @@ const productRoutes = require("./routes/products.js");
 const cartRoutes = require("./routes/cart.js");
 
 const app = express();
-const server = http.createServer(app);
+//const server = http.createServer(app);
 
-const io = socketIO(server, {
-  cors: {
-    origin: "https://frontend-swappo-app.vercel.app",
-    methods: ["GET", "POST"],
-  },
-});
+// const io = socketIO(server, {
+//   cors: {
+//     origin: allowedOrigins, // ✅ Use the same list as above
+//     credentials: true,
+//     // origin: "https://frontend-swappo-app.vercel.app",
+//     // methods: ["GET", "POST"],
+//   },
+// });
 
 // const io = socketIO(server, {
 //   cors: {
@@ -34,10 +36,9 @@ const io = socketIO(server, {
 // });
 
 const allowedOrigins = [
-  "http://localhost:5173",
-  "https://frontend-swappo-late-app.vercel.app", // ✅ Add your Vercel frontend domain here
+  //"http://localhost:5173",
   "https://frontend-swappo-late-app.vercel.app", // ✅ Add this one!
-  "https://frontend-swappo-lala-app.vercel.app", // ✅ Add this one!
+  "https://frontend-swappo-app.vercel.app",
 ];
 
 app.use(
@@ -71,33 +72,33 @@ mongoose
 
 mongoose.set("bufferTimeoutMS", 30000);
 
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+// io.on("connection", (socket) => {
+//   console.log("User connected:", socket.id);
 
-  // Listen for trade requests
-  socket.on("tradeRequest", (data) => {
-    const { toUserId, fromUserId, productId, offerValue } = data;
+//   // Listen for trade requests
+//   socket.on("tradeRequest", (data) => {
+//     const { toUserId, fromUserId, productId, offerValue } = data;
 
-    // Emit to the recipient user
-    io.to(toUserId).emit("receiveTradeRequest", {
-      fromUserId,
-      productId,
-      offerValue,
-    });
-  });
+//     // Emit to the recipient user
+//     io.to(toUserId).emit("receiveTradeRequest", {
+//       fromUserId,
+//       productId,
+//       offerValue,
+//     });
+//   });
 
-  socket.on("respondToTrade", (data) => {
-    io.to(data.fromUserId).emit("tradeResponse", data);
-  });
+//   socket.on("respondToTrade", (data) => {
+//     io.to(data.fromUserId).emit("tradeResponse", data);
+//   });
 
-  socket.on("join", (userId) => {
-    socket.join(userId); // Use userId as room
-  });
+//   socket.on("join", (userId) => {
+//     socket.join(userId); // Use userId as room
+//   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
-});
+//   socket.on("disconnect", () => {
+//     console.log("User disconnected:", socket.id);
+//   });
+// });
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -202,4 +203,4 @@ async function isValidPassword(user, password) {
   return await bcrypt.compare(password, user.password); // assuming user.password is the hashed password
 }
 
-server.listen(5000, () => console.log("Server running on port 5000"));
+app.listen(5000, () => console.log("Server running on port 5000"));

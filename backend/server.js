@@ -20,7 +20,7 @@ const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
-  //"http://localhost:5173",
+  "http://localhost:5173",
   "https://frontend-swappo-late-app.vercel.app", // ✅ Add this one!
   "https://frontend-swappo-app.vercel.app",
 ];
@@ -28,18 +28,12 @@ const allowedOrigins = [
 const io = socketIO(server, {
   cors: {
     origin: allowedOrigins, // ✅ Use the same list as above
-    credentials: true,
-    // origin: "https://frontend-swappo-app.vercel.app",
+    // origin: "http://localhost:5173",
     // methods: ["GET", "POST"],
+
+    credentials: true,
   },
 });
-
-// const io = socketIO(server, {
-//   cors: {
-//     origin: "http://localhost:5173", // frontend URL
-//     methods: ["GET", "POST"],
-//   },
-// });
 
 app.use(
   cors({

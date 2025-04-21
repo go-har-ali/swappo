@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User.js");
 const Product = require("./models/Product.js");
+const TradeRequest = require("./models/Trade");
 const multer = require("multer");
 const path = require("path");
 const http = require("http");
@@ -15,6 +16,7 @@ require("dotenv").config();
 
 const productRoutes = require("./routes/products.js");
 const cartRoutes = require("./routes/cart.js");
+const tradeRequestsRoutes = require("./routes/tradeRequests");
 
 const app = express();
 const server = http.createServer(app);
@@ -24,6 +26,7 @@ const allowedOrigins = [
   "https://frontend-swappo-late-app.vercel.app", // ✅ Add this one!
   "https://frontend-swappo-app.vercel.app",
   "https://frontend-swappo-mern.vercel.app",
+  "https://frontend-swappo-learn.vercel.app",
 ];
 
 const io = socketIO(server, {
@@ -70,26 +73,59 @@ mongoose.set("bufferTimeoutMS", 30000);
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // Listen for trade requests
-  socket.on("tradeRequest", (data) => {
-    const { toUserId, fromUserId, productId, offerValue } = data;
-
-    // Emit to the recipient user
-    io.to(toUserId).emit("receiveTradeRequest", {
-      fromUserId,
-      productId,
-      offerValue,
-    });
-  });
-
-  socket.on("respondToTrade", (data) => {
-    io.to(data.fromUserId).emit("tradeResponse", data);
-  });
-
+  // Join room using userId to allow targeted messages
   socket.on("join", (userId) => {
-    socket.join(userId); // Use userId as room
+    console.log("📥 JOIN REQUEST from user:", userId);
+    socket.join(userId);
+    console.log(`User ${userId} joined their room`);
   });
 
+  // Handle incoming trade request
+  socket.on("tradeRequest", async (data) => {
+    console.log("📨 Incoming trade request data:", data);
+    try {
+      const trade = new TradeRequest(data);
+      await trade.save();
+
+      console.log("✅ Trade request saved to DB:", trade);
+
+      // Emit to the target user room
+      io.to(data.toUserId).emit("tradeRequestReceived", trade);
+      console.log(
+        `Trade request sent from ${data.fromUserId} to ${data.toUserId}`
+      );
+    } catch (error) {
+      console.error("Error saving trade request:", error);
+    }
+  });
+
+  // Handle accept/reject trade
+  socket.on("respondToTrade", async ({ tradeId, status }) => {
+    console.log("📥 Trade response received:", { tradeId, status });
+
+    try {
+      const trade = await TradeRequest.findByIdAndUpdate(
+        tradeId,
+        { status },
+        { new: true }
+      );
+
+      if (!trade) {
+        console.error("Trade not found");
+        return;
+      }
+
+      console.log("✅ Trade updated in DB:", trade);
+
+      // Notify the sender about the response
+      io.to(trade.fromUserId.toString()).emit("tradeResponse", trade);
+      console.log(`Trade ${tradeId} responded with: ${status}`);
+    } catch (error) {
+      console.error("Error responding to trade:", error);
+    }
+  });
+
+  // Handle disconnection
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
@@ -111,6 +147,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/products", productRoutes);
 //app.use("api/products/inventory", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/trade-requests", tradeRequestsRoutes);
 
 app.post("/api/register", upload.single("profilePicture"), async (req, res) => {
   console.log("req body", req.body); // Debugging

@@ -14,19 +14,40 @@ require("dotenv").config();
 
 // "dev": "nodemon server.js"
 
+const app = express();
+
+app.set("trust proxy", 1); // Trust Render proxy
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      console.log("🚨 Incoming request origin:", origin); // Add this line
+
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ CORS BLOCKED:", origin); // Debug log
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+const server = http.createServer(app);
+
 const productRoutes = require("./routes/products.js");
 const cartRoutes = require("./routes/cart.js");
 const tradeRequestsRoutes = require("./routes/tradeRequests");
 
-const app = express();
-const server = http.createServer(app);
-
 const allowedOrigins = [
-  "http://localhost:5173",
+  //"http://localhost:5173",
   "https://frontend-swappo-late-app.vercel.app", // ✅ Add this one!
   "https://frontend-swappo-app.vercel.app",
   "https://frontend-swappo-mern.vercel.app",
   "https://frontend-swappo-learn.vercel.app",
+  "https://frontend-swappo-relearn.vercel.app",
+  "https://frontend-swappo-earn.vercel.app",
+  "https://frontend-swappo-earnapp.vercel.app",
 ];
 
 const io = socketIO(server, {
@@ -36,23 +57,12 @@ const io = socketIO(server, {
     // methods: ["GET", "POST"],
 
     credentials: true,
+
+    //methods: ["GET", "POST"], // Optional but helps
   },
 });
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
-
-app.use(cors());
+//app.use(cors());
 app.use(express.json()); // For parsing JSON body
 app.use(express.urlencoded({ extended: true })); // For form data
 app.use("/uploads", express.static("uploads")); // Serve uploaded images

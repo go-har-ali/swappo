@@ -15,32 +15,10 @@ require("dotenv").config();
 // "dev": "nodemon server.js"
 
 const app = express();
-
-app.set("trust proxy", 1); // Trust Render proxy
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      console.log("🚨 Incoming request origin:", origin); // Add this line
-
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("❌ CORS BLOCKED:", origin); // Debug log
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
 const server = http.createServer(app);
 
-const productRoutes = require("./routes/products.js");
-const cartRoutes = require("./routes/cart.js");
-const tradeRequestsRoutes = require("./routes/tradeRequests");
-
 const allowedOrigins = [
-  //"http://localhost:5173",
+  "http://localhost:5173",
   "https://frontend-swappo-late-app.vercel.app", // ✅ Add this one!
   "https://frontend-swappo-app.vercel.app",
   "https://frontend-swappo-mern.vercel.app",
@@ -48,7 +26,31 @@ const allowedOrigins = [
   "https://frontend-swappo-relearn.vercel.app",
   "https://frontend-swappo-earn.vercel.app",
   "https://frontend-swappo-earnapp.vercel.app",
+  "https://frontend-swappo-earnapplogic.vercel.app",
+  "https://frontend-swappo-eapp.vercel.app",
+  "https://frontend-swappo-eappe.vercel.app",
+  "https://frontend-swappo-chal.vercel.app",
 ];
+
+// CORS for Express
+// const corsOptions = {
+//   origin: allowedOrigins,
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+// };
+// app.use(cors(corsOptions)); // ✅ this one
+
+app.use(
+  cors({
+    origin: allowedOrigins, // allow your deployed frontend
+    credentials: true,
+  })
+);
+
+app.use(cors());
+app.use(express.json()); // For parsing JSON body
+app.use(express.urlencoded({ extended: true })); // For form data
+app.use("/uploads", express.static("uploads")); // Serve uploaded images
 
 const io = socketIO(server, {
   cors: {
@@ -58,14 +60,13 @@ const io = socketIO(server, {
 
     credentials: true,
 
-    //methods: ["GET", "POST"], // Optional but helps
+    methods: ["GET", "POST"], // Optional but helps
   },
 });
 
-//app.use(cors());
-app.use(express.json()); // For parsing JSON body
-app.use(express.urlencoded({ extended: true })); // For form data
-app.use("/uploads", express.static("uploads")); // Serve uploaded images
+const productRoutes = require("./routes/products.js");
+const cartRoutes = require("./routes/cart.js");
+const tradeRequestsRoutes = require("./routes/tradeRequests");
 
 // || "mongodb://localhost:27017/swappo"
 
@@ -79,6 +80,15 @@ mongoose
   .catch((err) => console.log(err));
 
 mongoose.set("bufferTimeoutMS", 30000);
+
+app.use((req, res, next) => {
+  const origin = req.get("origin") || req.get("referer") || "unknown";
+  const host = req.get("host") || "unknown";
+
+  console.log(`🚨 Origin: ${origin} | Host: ${host} | URL: ${req.url}`);
+
+  next();
+});
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);

@@ -32,6 +32,7 @@ const allowedOrigins = [
   "https://frontend-swappo-chal.vercel.app",
   "https://frontend-swappo-chalja.vercel.app",
   "https://frontend-swappo-chalbey.vercel.app",
+  "https://frontend-swappo-chalbe.vercel.app",
 ];
 
 // CORS for Express

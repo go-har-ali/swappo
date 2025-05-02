@@ -47,4 +47,16 @@ router.get("/received", verifyToken, async (req, res) => {
   }
 });
 
+// Route: GET /api/trade-requests/sent
+router.get("/sent", verifyToken, async (req, res) => {
+  try {
+    const sentRequests = await Trade.find({ requester: req.user.id })
+      .populate("requestedProduct")
+      .populate("offeredProduct");
+    res.json(sentRequests);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;

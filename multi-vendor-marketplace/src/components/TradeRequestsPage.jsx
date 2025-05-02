@@ -5,12 +5,12 @@ import socket from "../socket";
 import Navbar from "./Navbar";
 import { jwtDecode } from "jwt-decode";
 
-const BASE_URL = "https://swappo-6zd6.onrender.com";
+//const BASE_URL = "https://swappo-6zd6.onrender.com";
 
-// const BASE_URL =
-//   window.location.hostname === "localhost"
-//     ? "http://localhost:5000"
-//     : "https://swappo-6zd6.onrender.com";
+const BASE_URL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : "https://swappo-6zd6.onrender.com";
 
 const TradeRequestsPage = () => {
   const [tradeRequests, setTradeRequests] = useState([]);
@@ -37,6 +37,7 @@ const TradeRequestsPage = () => {
       console.log("Fetching trade requests for user:", userId);
       try {
         const res = await fetch(`${BASE_URL}/api/trade-requests/received`, {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
           },

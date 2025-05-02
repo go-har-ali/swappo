@@ -35,14 +35,6 @@ const allowedOrigins = [
   "https://frontend-swappo-chalbe.vercel.app",
 ];
 
-// CORS for Express
-// const corsOptions = {
-//   origin: allowedOrigins,
-//   credentials: true,
-//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-// };
-// app.use(cors(corsOptions)); // ✅ this one
-
 app.use(
   cors({
     origin: allowedOrigins, // allow your deployed frontend
@@ -57,7 +49,7 @@ app.use("/uploads", express.static("uploads")); // Serve uploaded images
 
 const io = socketIO(server, {
   cors: {
-    origin: allowedOrigins, // ✅ Use the same list as above
+    origin: "*", // ✅ Use the same list as above
     // origin: "http://localhost:5173",
     // methods: ["GET", "POST"],
 

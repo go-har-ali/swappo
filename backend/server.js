@@ -33,6 +33,7 @@ const allowedOrigins = [
   "https://frontend-swappo-chalja.vercel.app",
   "https://frontend-swappo-chalbey.vercel.app",
   "https://frontend-swappo-chalbe.vercel.app",
+  "https://frontend-swappo-chala.vercel.app",
 ];
 
 app.use(

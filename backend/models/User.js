@@ -12,6 +12,10 @@ const UserSchema = new mongoose.Schema({
     enum: ["client", "vendor"], // Allowed roles
     default: "client", // By default, new users are clients
   },
+  stripeAccountId: {
+    type: String,
+    default: null,
+  },
 
   createdAt: { type: Date, default: Date.now }, // Timestamp
 });

@@ -1,35 +1,30 @@
+// routes/payment.js
 const express = require("express");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const Trade = require("../models/Trade");
-
 const router = express.Router();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-router.post("/pay", async (req, res) => {
-  const { tradeId, paymentMethodId } = req.body;
+// POST /api/payment/checkout
+router.post("/checkout", async (req, res) => {
+  const { amount, product, connectedAccountId } = req.body;
 
   try {
-    const trade = await Trade.findById(tradeId);
-    if (!trade || trade.status !== "pending") {
-      return res.status(400).json({ error: "Invalid trade" });
-    }
+    // Create PaymentIntent for Connected Account
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100, // convert to cents
+      currency: "usd",
+      payment_method_types: ["card"],
+      application_fee_amount: Math.round(amount * 0.1 * 100), // 10% fee to platform
+      transfer_data: {
+        destination: connectedAccountId, // the seller's connected Stripe account
+      },
+    });
 
-    if (trade.priceDifference > 0) {
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: trade.priceDifference * 100, // Stripe accepts amounts in cents
-        currency: "usd",
-        payment_method: paymentMethodId,
-        confirm: true,
-      });
-
-      trade.status = "completed";
-      await trade.save();
-
-      return res.status(200).json({ message: "Payment successful", trade });
-    }
-
-    res.status(400).json({ error: "No payment needed" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Payment failed" });
   }
 });
 

@@ -11,6 +11,7 @@ const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
 require("dotenv").config();
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // "dev": "nodemon server.js"
 
@@ -64,6 +65,8 @@ const io = socketIO(server, {
 const productRoutes = require("./routes/products.js");
 const cartRoutes = require("./routes/cart.js");
 const tradeRequestsRoutes = require("./routes/tradeRequests");
+app.use("/api/payment", require("./routes/payment"));
+app.use("/api/users", require("./routes/users"));
 
 // || "mongodb://localhost:27017/swappo"
 
